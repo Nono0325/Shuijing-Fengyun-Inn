@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from datetime import timedelta
 from django.utils.dateformat import format
-from .models import CarouselItem, Service, DutyStaff, Course, Registration, Event, Story, USRAchievement, TechProject, ExperienceCourse
+from .models import CarouselItem, Service, DutyStaff, Course, Registration, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection
 from django.db.models import Q
 from django.core.paginator import Paginator
 from .forms import RegistrationForm
@@ -284,8 +284,8 @@ def usr_showcase(request):
     return render(request, 'inn_app/usr_showcase.html', {'achievements': achievements})
 
 def aiot_guide(request):
-    projects = TechProject.objects.filter(is_active=True)
-    return render(request, 'inn_app/aiot_guide.html', {'projects': projects})
+    sections = TechSection.objects.filter(is_active=True).prefetch_related('projects')
+    return render(request, 'inn_app/aiot_guide.html', {'sections': sections})
 
 def workshop_list(request):
     workshops = ExperienceCourse.objects.all()

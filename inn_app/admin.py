@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CarouselItem, Service, DutyStaff, Course, Registration, SigninTemplate, Event, Story, USRAchievement, TechProject, ExperienceCourse
+from .models import CarouselItem, Service, DutyStaff, Course, Registration, SigninTemplate, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection
 import openpyxl
 from django.http import HttpResponse
 from django.utils.timezone import localtime
@@ -70,8 +70,8 @@ def export_course_registrations_to_excel(modeladmin, request, queryset):
 
 @admin.register(CarouselItem)
 class CarouselItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'order', 'is_active')
-    list_editable = ('order', 'is_active')
+    list_display = ('title', 'order', 'show_title', 'show_subtitle', 'is_active')
+    list_editable = ('order', 'show_title', 'show_subtitle', 'is_active')
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
@@ -188,10 +188,21 @@ class USRAchievementAdmin(admin.ModelAdmin):
     list_filter = ('type', 'date')
     search_fields = ('title', 'summary')
 
+class TechProjectInline(admin.StackedInline):
+    model = TechProject
+    extra = 1
+
+@admin.register(TechSection)
+class TechSectionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'layout_type', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    inlines = [TechProjectInline]
+
 @admin.register(TechProject)
 class TechProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'is_active')
-    list_filter = ('type', 'is_active')
+    list_display = ('name', 'section', 'order', 'is_active')
+    list_editable = ('section', 'order', 'is_active')
+    list_filter = ('section', 'is_active')
 
 @admin.register(ExperienceCourse)
 class ExperienceCourseAdmin(admin.ModelAdmin):

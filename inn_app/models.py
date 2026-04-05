@@ -7,6 +7,8 @@ class CarouselItem(models.Model):
     subtitle = models.CharField('副標題', max_length=200, blank=True)
     image = models.ImageField('圖片', upload_to='carousel/')
     order = models.IntegerField('排序', default=0)
+    show_title = models.BooleanField('顯示標題', default=True)
+    show_subtitle = models.BooleanField('顯示副標題', default=True)
     is_active = models.BooleanField('上架狀態', default=True)
 
     class Meta:
@@ -173,23 +175,42 @@ class USRAchievement(models.Model):
     def __str__(self):
         return self.title
 
-class TechProject(models.Model):
-    PROJECT_TYPES = [
-        ('aiot', 'AIoT 應用'),
-        ('ar_interact', 'AR/互動導覽'),
+class TechSection(models.Model):
+    title = models.CharField('區塊標題', max_length=100)
+    intro_text = HTMLField('前言/簡介', blank=True)
+    image = models.ImageField('側邊圖片', upload_to='tech_sections/', null=True, blank=True)
+    LAYOUT_CHOICES = [
+        ('side_image', '左圖右卡片 (AIoT 樣式)'),
+        ('side_text', '左文右方塊 (AR 樣式)'),
     ]
-    name = models.CharField('專案名稱', max_length=100)
-    type = models.CharField('技術類型', max_length=20, choices=PROJECT_TYPES)
-    description = HTMLField('技術細節說明')
-    image = models.ImageField('示意圖', upload_to='tech/')
+    layout_type = models.CharField('排版樣式', max_length=20, choices=LAYOUT_CHOICES, default='side_image')
+    order = models.IntegerField('排序', default=0)
     is_active = models.BooleanField('啟用', default=True)
 
     class Meta:
+        ordering = ['order']
+        verbose_name = '科技專案區塊'
+        verbose_name_plural = '科技專案區塊'
+
+    def __str__(self):
+        return self.title
+
+class TechProject(models.Model):
+    section = models.ForeignKey(TechSection, on_delete=models.CASCADE, related_name='projects', verbose_name='所屬區塊', null=True, blank=True)
+    name = models.CharField('專案名稱', max_length=100)
+    type = models.CharField('技術類型 (舊版)', max_length=20, choices=[('aiot', 'AIoT 應用'), ('ar_interact', 'AR/互動導覽')], blank=True)
+    description = HTMLField('技術細節說明')
+    image = models.ImageField('示意圖', upload_to='tech/', null=True, blank=True)
+    order = models.IntegerField('排序', default=0)
+    is_active = models.BooleanField('啟用', default=True)
+
+    class Meta:
+        ordering = ['order']
         verbose_name = '科技特色項目'
         verbose_name_plural = '科技特色項目'
 
     def __str__(self):
-        return f"({self.get_type_display()}) {self.name}"
+        return self.name
 
 class ExperienceCourse(models.Model):
     name = models.CharField('課程名稱', max_length=100)

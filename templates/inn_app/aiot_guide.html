@@ -10,79 +10,93 @@
             <p class="text-muted">將現代科技導入傳統聚落，開創智慧漁業與趣味觀光的新局面。</p>
         </div>
 
-        <!-- AIoT Sections -->
-        <div class="row g-5">
-            <div class="col-lg-6">
-                <div class="sticky-top" style="top: 100px;">
-                    <img src="https://images.unsplash.com/photo-1558444479-c8af537900b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Tech" class="img-fluid rounded-4 shadow-lg mb-4">
-                    <h3 class="fw-bold mb-3"><i class="fa-solid fa-microchip text-primary me-2"></i>智慧轉型的願景</h3>
-                    <p class="text-muted fs-5">透過感測器與雲端監控，我們協助水井村的農漁民轉型。不僅減少了人力成本，更透過精準數據分析，穩定了生產品質。</p>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="row g-4">
-                    {% for tech in projects %}
-                    <div class="col-12">
-                        <div class="card p-4 border-0 shadow-sm rounded-4 hover-shadow transition">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
-                                    {% if tech.type == 'aiot' %}<i class="fa-solid fa-tower-broadcast text-primary"></i>
-                                    {% else %}<i class="fa-solid fa-street-view text-success"></i>{% endif %}
-                                </div>
-                                <h4 class="fw-bold mb-0 text-dark">{{ tech.name }}</h4>
-                            </div>
-                            <div class="text-muted mb-3">
-                                {{ tech.description|safe }}
-                            </div>
-                            <span class="badge bg-light text-dark align-self-start">{{ tech.get_type_display }}</span>
+        {% for section in sections %}
+            {% if section.layout_type == 'side_image' %}
+            <!-- Layout: Side Image + Cards (AIoT Style) -->
+            <div class="row g-5 mb-5 pt-5">
+                <div class="col-lg-6">
+                    <div class="sticky-top" style="top: 100px;">
+                        {% if section.image %}
+                        <img src="{{ section.image.url }}" alt="{{ section.title }}" class="img-fluid rounded-4 shadow-lg mb-4">
+                        {% else %}
+                        <div class="bg-light rounded-4 d-flex align-items-center justify-content-center mb-4" style="height: 300px;">
+                            <i class="fa-solid fa-microchip text-primary fa-5x"></i>
+                        </div>
+                        {% endif %}
+                        <h3 class="fw-bold mb-3"><i class="fa-solid fa-compass text-primary me-2"></i>{{ section.title }}</h3>
+                        <div class="text-muted fs-5">
+                            {{ section.intro_text|safe }}
                         </div>
                     </div>
-                    {% endfor %}
+                </div>
+                <div class="col-lg-6">
+                    <div class="row g-4">
+                        {% for tech in section.projects.all %}
+                        {% if tech.is_active %}
+                        <div class="col-12">
+                            <div class="card p-4 border-0 shadow-sm rounded-4 hover-shadow transition">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                        {% if section.id == 1 %}<i class="fa-solid fa-tower-broadcast text-primary"></i>
+                                        {% else %}<i class="fa-solid fa-microchip text-primary"></i>{% endif %}
+                                    </div>
+                                    <h4 class="fw-bold mb-0 text-dark">{{ tech.name }}</h4>
+                                </div>
+                                <div class="text-muted mb-3">
+                                    {{ tech.description|safe }}
+                                </div>
+                                {% if tech.image %}
+                                <img src="{{ tech.image.url }}" class="img-fluid rounded-3 mb-3" alt="{{ tech.name }}" style="max-height: 200px; object-fit: cover;">
+                                {% endif %}
+                                <span class="badge bg-light text-dark align-self-start">科技項目</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
+            {% else %}
+            <!-- Layout: Side Text + Feature Boxes (AR Style) -->
+            <div class="row align-items-center g-5 mb-5 py-5 {% if not forloop.first %}border-top{% endif %}">
+                <div class="col-lg-5">
+                    <h2 class="display-5 fw-bold" style="color: var(--primary-color);">{{ section.title }}</h2>
+                    <div class="text-muted fs-5 mt-3">
+                        {{ section.intro_text|safe }}
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="row g-3">
+                        {% for tech in section.projects.all %}
+                        {% if tech.is_active %}
+                        <div class="col-6">
+                            <div class="bg-white p-4 rounded-4 text-center shadow-sm h-100 hover-shadow transition">
+                                {% if tech.image %}
+                                <img src="{{ tech.image.url }}" class="img-fluid rounded-3 mb-3" alt="{{ tech.name }}" style="height: 60px; object-fit: contain;">
+                                {% else %}
+                                <i class="fa-solid fa-cube fa-3x text-primary mb-3"></i>
+                                {% endif %}
+                                <h6 class="fw-bold">{{ tech.name }}</h6>
+                                <p class="small text-muted mb-0">{{ tech.description|striptags|truncatechars:40 }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </section>
 
-<!-- AR/Interactive Guide Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-5">
-                <h2 class="display-5 fw-bold" style="color: var(--primary-color);">AR/互動導覽</h2>
-                <p class="text-muted fs-5 mt-3">利用手機掃描水井牆上的 QR Code，即可召喚專屬 AR 導航小精靈，帶領您遊覽古道與光雕牆。</p>
-                <div class="mt-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fa-solid fa-check-circle text-success me-2"></i>
-                        <span>水井光導覽點位：目前已建置 5 個點位</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fa-solid fa-check-circle text-success me-2"></i>
-                        <span>即時語音說明：透過語音讀取在地歷史故事</span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <i class="fa-solid fa-check-circle text-success me-2"></i>
-                        <span>互動解謎任務：適合親子共學，探索水井村三寶</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-7">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="bg-white p-4 rounded-4 text-center shadow-sm">
-                            <i class="fa-solid fa-qrcode fa-3x text-primary mb-3"></i>
-                            <h6 class="fw-bold">掃碼啟動</h6>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="bg-white p-4 rounded-4 text-center shadow-sm">
-                            <i class="fa-solid fa-mobile-screen-button fa-3x text-primary mb-3"></i>
-                            <h6 class="fw-bold">AR 互動</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+        transform: translateY(-5px);
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+</style>
 {% endblock %}

@@ -19,12 +19,16 @@
             {% else %}
             <img src="https://via.placeholder.com/1920x800.png?text=Image" class="d-block w-100" alt="Placeholder">
             {% endif %}
+            {% if item.show_title or item.show_subtitle %}
             <div class="carousel-caption d-none d-md-block pb-5">
+                {% if item.show_title %}
                 <h1 class="display-3 fw-bold">{{ item.title }}</h1>
-                {% if item.subtitle %}
+                {% endif %}
+                {% if item.show_subtitle and item.subtitle %}
                 <p class="fs-4">{{ item.subtitle }}</p>
                 {% endif %}
             </div>
+            {% endif %}
         </div>
         {% empty %}
         <!-- Demo Static Slide if empty -->
