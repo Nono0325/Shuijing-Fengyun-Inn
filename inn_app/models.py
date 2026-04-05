@@ -224,3 +224,33 @@ class ExperienceCourse(models.Model):
 
     def __str__(self):
         return self.name
+
+class ContactInfo(models.Model):
+    title = models.CharField('頁面標題', max_length=100, default='聯絡我們')
+    intro_text = models.TextField('前言簡介', default='有任何問題或是想要預約特別活動嗎？歡迎隨時與我們聯繫！我們會盡快回覆您。')
+    address = models.CharField('地址', max_length=200, default='桃園市水井村風雲街 8 號')
+    phone = models.CharField('電話', max_length=50, default='(03) 1234-5678')
+    email = models.EmailField('電子郵件', default='service@fengyuninn.com')
+    is_active = models.BooleanField('啟用', default=True)
+
+    class Meta:
+        verbose_name = '聯絡資訊設定'
+        verbose_name_plural = '聯絡資訊設定'
+
+    def __str__(self):
+        return self.title
+
+class ContactMessage(models.Model):
+    name = models.CharField('姓名', max_length=100)
+    phone = models.CharField('電話', max_length=50)
+    email = models.EmailField('Email')
+    message = models.TextField('訊息內容')
+    created_at = models.DateTimeField('收件時間', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '聯絡訊息收件夾'
+        verbose_name_plural = '聯絡訊息收件夾'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name} - {self.created_at.strftime("%Y-%m-%d %H:%M")}'

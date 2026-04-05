@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CarouselItem, Service, DutyStaff, Course, Registration, SigninTemplate, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection
+from .models import CarouselItem, Service, DutyStaff, Course, Registration, SigninTemplate, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection, ContactInfo, ContactMessage
 import openpyxl
 from django.http import HttpResponse
 from django.utils.timezone import localtime
@@ -208,3 +208,15 @@ class TechProjectAdmin(admin.ModelAdmin):
 class ExperienceCourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'category')
     list_filter = ('category',)
+
+@admin.register(ContactInfo)
+class ContactInfoAdmin(admin.ModelAdmin):
+    list_display = ('title', 'phone', 'email', 'is_active')
+    list_editable = ('is_active',)
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'email', 'created_at')
+    readonly_fields = ('name', 'phone', 'email', 'message', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('name', 'phone', 'email', 'message')

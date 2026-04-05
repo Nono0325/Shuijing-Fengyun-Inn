@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from datetime import timedelta
 from django.utils.dateformat import format
-from .models import CarouselItem, Service, DutyStaff, Course, Registration, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection
+from .models import CarouselItem, Service, DutyStaff, Course, Registration, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection, ContactInfo, ContactMessage
 from django.db.models import Q
 from django.core.paginator import Paginator
 from .forms import RegistrationForm
@@ -254,11 +254,25 @@ def event_detail(request, event_id):
     return render(request, 'inn_app/event_detail.html', {'event': event})
 
 def contact(request):
+    contact_info = ContactInfo.objects.filter(is_active=True).first()
     if request.method == 'POST':
-        # 在實際應用中可以在此處理表單發送，目前僅作示範
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        
+        # Save to database
+        ContactMessage.objects.create(
+            name=name,
+            phone=phone,
+            email=email,
+            message=message
+        )
+        
         messages.success(request, '感謝您的訊息！我們將盡快與您聯絡。')
         return redirect('inn_app:contact')
-    return render(request, 'inn_app/contact.html')
+        
+    return render(request, 'inn_app/contact.html', {'contact_info': contact_info})
 
 def story_list(request):
     cat = request.GET.get('cat')
