@@ -1,10 +1,31 @@
-# 水井村風雲客棧 - 系統安裝與環境部署手冊 (Installation Manual)
+---
 
-本文件將引導系統管理員或開發者，從零開始在新的電腦環境中架設「水井村風雲客棧」網站系統。
+## 壹、 專案目錄結構 (Project Structure)
+
+了解專案的目錄結構有助於後續的維護與開發：
+
+```text
+Shuijing-Fengyun-Inn/
+├── fengyun/              # 專案核心設定 (Settings, WSGI, Root URLs)
+├── inn_app/              # 主要應用程式邏輯 (Models, Views, Admin)
+│   ├── migrations/       # 資料庫遷移紀錄
+│   └── ...
+├── media/                # 媒體檔案 (使用者上傳的圖片、Word 範本)
+├── static/               # 靜態檔案原始目錄 (CSS, JS, Images)
+├── templates/            # HTML 模板頁面
+├── staticfiles/          # 生產環境收集後的靜態檔案 (WhiteNoise 使用)
+├── manage.py             # Django 管理腳本
+├── requirements.txt      # 專案套件依賴清單
+├── Procfile              # 雲端平台啟動定義 (Render/Heroku)
+├── render.yaml           # Render 一鍵部署藍圖
+├── init_setup.bat/sh     # 本地環境一鍵初始化腳本
+├── install.ps1/sh        # 遠端引導安裝腳本 (One-Liner)
+└── seed*.py              # 測試資料種子填充指令
+```
 
 ---
 
-## 壹、 基礎環境要求
+## 貳、 基礎環境要求
 
 在開始安裝之前，請確保您的電腦已安裝下列軟體：
 1. **Python 3.12+**: [下載位址](https://www.python.org/downloads/) (建議安裝時勾選 "Add Python to PATH")。
