@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}AIoT 科技與互動導覽 - 風雲客棧數位入口平台{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-white">
+    <div class="container mt-4">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold" style="color: var(--primary-color);">AIoT 科技與互動導覽</h1>
+            <p class="text-muted">將現代科技導入傳統聚落，開創智慧漁業與趣味觀光的新局面。</p>
+        </div>
+
+        <!-- AIoT Sections -->
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="sticky-top" style="top: 100px;">
+                    <img src="https://images.unsplash.com/photo-1558444479-c8af537900b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Tech" class="img-fluid rounded-4 shadow-lg mb-4">
+                    <h3 class="fw-bold mb-3"><i class="fa-solid fa-microchip text-primary me-2"></i>智慧轉型的願景</h3>
+                    <p class="text-muted fs-5">透過感測器與雲端監控，我們協助水井村的農漁民轉型。不僅減少了人力成本，更透過精準數據分析，穩定了生產品質。</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-4">
+                    {% for tech in projects %}
+                    <div class="col-12">
+                        <div class="card p-4 border-0 shadow-sm rounded-4 hover-shadow transition">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                    {% if tech.type == 'aiot' %}<i class="fa-solid fa-tower-broadcast text-primary"></i>
+                                    {% else %}<i class="fa-solid fa-street-view text-success"></i>{% endif %}
+                                </div>
+                                <h4 class="fw-bold mb-0 text-dark">{{ tech.name }}</h4>
+                            </div>
+                            <div class="text-muted mb-3">
+                                {{ tech.description|safe }}
+                            </div>
+                            <span class="badge bg-light text-dark align-self-start">{{ tech.get_type_display }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AR/Interactive Guide Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <h2 class="display-5 fw-bold" style="color: var(--primary-color);">AR/互動導覽</h2>
+                <p class="text-muted fs-5 mt-3">利用手機掃描水井牆上的 QR Code，即可召喚專屬 AR 導航小精靈，帶領您遊覽古道與光雕牆。</p>
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fa-solid fa-check-circle text-success me-2"></i>
+                        <span>水井光導覽點位：目前已建置 5 個點位</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fa-solid fa-check-circle text-success me-2"></i>
+                        <span>即時語音說明：透過語音讀取在地歷史故事</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-check-circle text-success me-2"></i>
+                        <span>互動解謎任務：適合親子共學，探索水井村三寶</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="bg-white p-4 rounded-4 text-center shadow-sm">
+                            <i class="fa-solid fa-qrcode fa-3x text-primary mb-3"></i>
+                            <h6 class="fw-bold">掃碼啟動</h6>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-white p-4 rounded-4 text-center shadow-sm">
+                            <i class="fa-solid fa-mobile-screen-button fa-3x text-primary mb-3"></i>
+                            <h6 class="fw-bold">AR 互動</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - 水井村風雲客棧{% endblock %}
+
+{% block seo_meta %}
+<meta property="og:title" content="{{ course.title }} - 水井村風雲客棧">
+<meta property="og:description" content="{{ course.description|truncatechars:100 }}">
+<meta property="og:type" content="website">
+{% if course.image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ course.image.url }}">
+{% else %}
+<meta property="og:image" content="https://images.unsplash.com/photo-1542314831-c6a4d14effb0?q=80&w=1200&auto=format&fit=crop">
+{% endif %}
+<meta property="og:site_name" content="水井村風雲客棧">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            {% if course.image %}
+            <img src="{{ course.image.url }}" class="img-fluid rounded-4 shadow" alt="{{ course.title }}">
+            {% else %}
+            <div class="bg-secondary rounded-4 shadow d-flex align-items-center justify-content-center text-white" style="height: 400px;">
+                <i class="fa-solid fa-camera fa-4x mb-3"></i>
+                <h5>無圖片</h5>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-lg-6 px-4">
+            <h1 class="display-5 fw-bold mb-3">{{ course.title }}</h1>
+            <div class="d-flex align-items-center text-muted mb-4 fs-5">
+                <span class="me-4"><i class="fa-solid fa-calendar-day me-2"></i>{{ course.start_time|date:"Y年m月d日 H:i" }}{% if course.end_time %} ~ {{ course.end_time|date:"H:i" }}{% endif %}</span>
+                <span><i class="fa-solid fa-chalkboard-user me-2"></i>講師：{{ course.instructor }}</span>
+            </div>
+            <p class="fs-5 lh-lg mb-4">{{ course.description|safe }}</p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <div class="alert alert-warning mb-0 d-inline-block shadow-sm py-2 text-dark">
+                    <i class="fa-solid fa-users text-warning me-2"></i> 名額限制：<strong>{{ course.capacity }} 人</strong>
+                    {% if is_full %}
+                    <span class="badge bg-danger ms-2 rounded-pill">額滿，目前開放候補登記</span>
+                    {% endif %}
+                </div>
+                {% if course.includes_lunch %}
+                <div class="alert alert-success mb-0 d-inline-block shadow-sm py-2 text-dark">
+                    <i class="fa-solid fa-utensils text-success me-2"></i> <strong>提供客棧專屬午餐</strong>
+                </div>
+                {% endif %}
+                {% if course.requires_computer %}
+                <div class="alert alert-info mb-0 d-inline-block shadow-sm py-2 text-dark">
+                    <i class="fa-solid fa-laptop text-primary me-2"></i> <strong>需自備筆記型電腦</strong>
+                </div>
+                {% endif %}
+                {% if course.recommended_age %}
+                <div class="alert alert-secondary mb-0 d-inline-block shadow-sm py-2 border-0 text-dark" style="background-color:#eef1f5;">
+                    <i class="fa-solid fa-child-reaching text-secondary me-2"></i> <strong>建議年齡：{{ course.recommended_age }}</strong>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-4 text-secondary">
+                <i class="fa-regular fa-clock me-2"></i> <strong>報名開放期間：</strong>
+                {% if course.reg_start_time and course.reg_end_time %}
+                    {{ course.reg_start_time|date:"Y/m/d H:i" }} ~ {{ course.reg_end_time|date:"Y/m/d H:i" }}
+                {% elif course.reg_start_time %}
+                    {{ course.reg_start_time|date:"Y/m/d H:i" }} 開放報名
+                {% elif course.reg_end_time %}
+                    將於 {{ course.reg_end_time|date:"Y/m/d H:i" }} 截止
+                {% else %}
+                    目前隨時開放報名，額滿為止
+                {% endif %}
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="fw-bold text-muted mb-3">馬上搶先記進行事曆：</h6>
+                <div class="d-flex gap-2">
+                    <a href="{{ gcal_url }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">
+                        <i class="fa-brands fa-google me-2"></i>Google 日曆
+                    </a>
+                    <a href="{% url 'inn_app:download_ics' course.id %}" class="btn btn-outline-dark rounded-pill px-4">
+                        <i class="fa-brands fa-apple me-2"></i>Apple / Outlook 日曆
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 800px; background-color: white;">
+        <div class="card-header bg-primary text-white text-center rounded-top-4 py-3" style="background-color: var(--primary-color) !important;">
+            <h3 class="mb-0"><i class="fa-solid fa-pen-to-square me-2"></i>線上報名</h3>
+        </div>
+        <div class="card-body p-5">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="name" class="form-label lh-base fw-bold">姓名 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-lg bg-light" id="name" name="name" required maxlength="50" placeholder="請輸入姓名">
+                    <div class="invalid-feedback fw-bold fs-6">您必須填寫真實姓名才能執行報名！</div>
+                </div>
+                <div class="mb-4">
+                    <label for="phone" class="form-label lh-base fw-bold">聯絡電話 <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control form-control-lg bg-light" id="phone" name="phone" required pattern="[0-9\-+]+" maxlength="20" title="僅允許輸入數字或符號 - +" placeholder="0912-345-678">
+                    <div class="invalid-feedback fw-bold fs-6">請填寫正確的聯絡電話，不可留空！</div>
+                </div>
+                <div class="mb-5">
+                    <label for="email" class="form-label lh-base fw-bold">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control form-control-lg bg-light" id="email" name="email" required maxlength="254" placeholder="example@mail.com">
+                    <div class="invalid-feedback fw-bold fs-6">信箱為必填欄位，請提供正確格式之 Email！</div>
+                </div>
+                <div class="mb-4">
+                    <label for="gender" class="form-label lh-base fw-bold">生理性別 <span class="text-danger">*</span></label>
+                    <select class="form-select form-select-lg bg-light" id="gender" name="gender" required>
+                        <option value="" selected disabled>請選擇您的性別</option>
+                        <option value="M">男</option>
+                        <option value="F">女</option>
+                        <option value="O">其他 / 不便透露</option>
+                    </select>
+                    <div class="invalid-feedback fw-bold fs-6">因活動分組或統計需求，請選擇性別！</div>
+                </div>
+                <div class="mb-5">
+                    <label for="headcount" class="form-label lh-base fw-bold">同行報名人數 (含本人) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control form-control-lg bg-light" id="headcount" name="headcount" min="1" max="5" value="1" required>
+                    <div class="invalid-feedback fw-bold fs-6">報名總數不得低於 1 人，最多只能填寫 5 人！您的填寫格式錯誤。</div>
+                    <div class="form-text mt-2 fs-6"><i class="fa-solid fa-circle-info text-primary me-1"></i>為保障活動品質，每筆報名最多僅能攜伴 4 人（共 5 人）。</div>
+                </div>
+                <div class="text-center mt-4">
+                    {% if not is_reg_open %}
+                    <button type="button" class="btn btn-secondary btn-lg px-5 rounded-pill w-100 py-3 disabled"><i class="fa-solid fa-clock-rotate-left me-2"></i>{{ reg_status_msg }}</button>
+                    {% elif is_full %}
+                    <button type="submit" class="btn btn-warning btn-lg px-5 rounded-pill w-100 py-3 shadow-sm hover-elevate">
+                        <i class="fa-solid fa-hourglass-half me-2"></i>目前名額已滿，轉入候補登記
+                    </button>
+                    {% else %}
+                    <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill w-100 py-3 shadow-sm hover-elevate">
+                        <i class="fa-regular fa-paper-plane me-2"></i>確認報名
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bootstrap 5 自訂表單強烈驗證機制
+(function () {
+  'use strict'
+  // 取得所有需要套用自訂驗證樣式的表單
+  var forms = document.querySelectorAll('.needs-validation')
+  // 迴圈綁定送出事件，若不合法則亮起紅框阻擋
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}
