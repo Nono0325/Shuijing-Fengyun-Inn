@@ -31,9 +31,10 @@ echo -e "\033[1;32m✅ 環境檢查通過 (Git & Python 已就緒)\033[0m"
 # 2. 下載專案
 echo -e "\n[2/4] 正在從 GitHub 下載最新專案原始碼..."
 if [ -d "$FOLDER_NAME" ]; then
-    echo -e "\033[1;30m⚠️ 資料夾 '$FOLDER_NAME' 已存在，正在嘗試更新...\033[0m"
+    echo -e "\033[1;30m⚠️ 資料夾 '$FOLDER_NAME' 已存在，正在強制更新至最新版本...\033[0m"
     cd "$FOLDER_NAME"
-    git pull
+    git fetch --all
+    git reset --hard origin/main
 else
     git clone "$REPO_URL"
     cd "$FOLDER_NAME"

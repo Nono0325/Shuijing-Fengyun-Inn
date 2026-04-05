@@ -29,19 +29,22 @@ Write-Host "✅ 環境檢查通過 (Git & Python 已就緒)" -ForegroundColor Gr
 # 2. 下載專案
 Write-Host "[2/4] 正在從 GitHub 下載最新專案原始碼..." -ForegroundColor Yellow
 if (Test-Path $folderName) {
-    Write-Host "⚠️ 資料夾 '$folderName' 已存在，正在嘗試更新..." -ForegroundColor Gray
-    cd $folderName
-    git pull
-} else {
+    Write-Host "⚠️ 資料夾 '$folderName' 已存在，正在強制更新至最新版本..." -ForegroundColor Gray
+    Set-Location $folderName
+    git fetch --all
+    git reset --hard origin/main
+}
+else {
     git clone $repoUrl
-    cd $folderName
+    Set-Location $folderName
 }
 
 # 3. 執行初始化
 Write-Host "[3/4] 正在啟動專案初始化腳本 (init_setup.bat)..." -ForegroundColor Yellow
 if (Test-Path "init_setup.bat") {
     Start-Process "cmd.exe" -ArgumentList "/c init_setup.bat" -Wait
-} else {
+}
+else {
     Write-Host "❌ 找不到 init_setup.bat，請確認專案完整性。" -ForegroundColor Red
     exit
 }
