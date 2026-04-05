@@ -4,9 +4,22 @@
 
 本專案為「風雲客棧」數位入口平台，整合了在地故事、USR 成果、AIoT 科技應用以及活動報名系統。
 
-## 🚀 快速開始 (一行指令部署)
+## 🚀 快速開始 (一行指令安裝)
 
-### 1. 雲端部署 (GitHub One-Click)
+### 1. 全自動下載暨安裝 (The One-Liner)
+如果您想直接下載並啟動，只需開啟終端機貼上這行：
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Nono0325/Shuijing-Fengyun-Inn/main/install.ps1 | iex
+```
+
+**Linux / Mac / Git Bash:**
+```bash
+curl -sSL https://raw.githubusercontent.com/Nono0325/Shuijing-Fengyun-Inn/main/install.sh | bash
+```
+
+### 2. 雲端部署 (GitHub One-Click)
 若您已將此專案上傳至您的 GitHub 帳號：
 1. 點擊上方的 **Deploy to Render** 按鈕。
 2. 登入 Render 並連結您的 GitHub 倉庫。
