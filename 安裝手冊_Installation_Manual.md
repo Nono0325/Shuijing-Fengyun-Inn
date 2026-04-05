@@ -96,5 +96,39 @@ python manage.py runserver
 
 ---
 
+---
+
+## 陸、 雲端平台部署指南 (PythonAnywhere)
+
+本系統與 **PythonAnywhere** 免費版高度相容。請依照下列步驟手動佈置您的雲端環境：
+
+### 1. 建立代碼與虛擬環境
+請在 PythonAnywhere **Bash Console** 執行：
+```bash
+git clone https://github.com/Nono0325/Shuijing-Fengyun-Inn.git
+mkvirtualenv --python=/usr/bin/python3.10 myenv
+pip install -r requirements.txt
+```
+
+### 2. 環境靜態資源初始化
+```bash
+python manage.py collectstatic --noinput
+python manage.py migrate
+python create_admin.py  # 備用，若資料庫為空則執行
+```
+
+### 3. WSGI 與 Web 頁籤設定
+請登入 PythonAnywhere 後台 [Web] 頁籤：
+- **Source code**: `/home/您的帳號/Shuijing-Fengyun-Inn`
+- **WSGI configuration file**: 點開後，將預設內容取代為專用配置。
+- **Static files Mapping**:
+  - `/static/` -> `/home/您的帳號/Shuijing-Fengyun-Inn/staticfiles/`
+  - `/media/` -> `/home/您的帳號/Shuijing-Fengyun-Inn/media/`
+
+> [!TIP]
+> 完整的 PythonAnywhere 專用 WSGI 配置範本及細節，請參考專案中的 `README.md` 或諮詢開發團隊。
+
+---
+
 > [!NOTE]
 > 關於日常營運操作（如新增課程、編輯內容），請參閱另一個檔案：[使用手冊_User_Manual.md](./使用手冊_User_Manual.md)。
