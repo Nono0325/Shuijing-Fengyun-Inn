@@ -15,8 +15,14 @@
 
 ## 貳、 安裝步驟 (Windows 環境)
 
-### 1. 取得專案原始碼
-將專案資料夾 (例如 `Nono`) 複製到您的電腦桌面上，或使用 Git 複製。
+### 1. 取得專案原始碼 (快速方式)
+您可以直接使用「超·一行指令」自動下載並初始化：
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Nono0325/Shuijing-Fengyun-Inn/main/install.ps1 | iex
+```
+
+或是手動將專案資料夾 (例如 `Nono`) 複製到您的電腦桌面上，或使用 Git 複製。
 
 ### 2. 建立虛擬環境 (Virtual Environment)
 開啟 PowerShell 或 CMD，進入專案目錄 (`cd C:\Users\user\Desktop\Nono`)，執行：
