@@ -1,5 +1,5 @@
 asgiref==3.11.1
-Django==6.0.3
+Django>=5.2,<6.0
 django-tinymce==5.0.0
 docxtpl==0.20.2
 et_xmlfile==2.0.0
