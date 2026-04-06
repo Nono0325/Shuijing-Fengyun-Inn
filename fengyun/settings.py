@@ -139,4 +139,32 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==========================================
+# [資安加固設定] Security Hardening
+# ==========================================
+IS_PRODUCTION = os.environ.get('IS_PRODUCTION', 'False') == 'True'
+
+if IS_PRODUCTION:
+    # 強制 HTTPS
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # HSTS 設定 (1年)
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # 生產環境下 SECRET_KEY 必須從環境變數取得，否則噴錯
+    if SECRET_KEY.startswith('django-insecure'):
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured("生產環境必須使用安全的 SECRET_KEY，請檢查 .env 設定。")
+
+# 瀏覽器安全性標頭
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'  # 防止點擊劫持 (Clickjacking)

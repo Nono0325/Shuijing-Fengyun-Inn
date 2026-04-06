@@ -82,6 +82,11 @@ def course_detail(request, course_id):
                     [registration.email],
                     fail_silently=True,
                 )
+                # Store waitlist info in session
+                request.session['show_waitlist_modal'] = True
+                request.session['waitlist_num'] = registration.waitlist_number
+                request.session['reg_name'] = registration.name
+                request.session['reg_course'] = course.title
             else:
                 # [正取機制]
                 registration.save()
@@ -95,12 +100,23 @@ def course_detail(request, course_id):
                     fail_silently=True,
                 )
                 
+                # Store data in session for the popup modal after redirect
+                request.session['show_qr_modal'] = True
+                request.session['reg_token'] = str(registration.checkin_token)
+                request.session['reg_name'] = registration.name
+                request.session['reg_course'] = course.title
+                
             return redirect('inn_app:course_detail', course_id=course.id)
         else:
-            # 若資料異常或違反重複報名，將錯誤訊息提示給外層
+            # Collect errors for the modal
+            error_msg_list = []
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{error}")
+                    error_msg_list.append(error)
+            
+            # Form errors are rendered directly, so we pass this specifically for the render
+            context_error_msg = "\n".join(error_msg_list)
             
     # Generate Google Calendar URL
     from urllib.parse import quote
@@ -113,12 +129,33 @@ def course_detail(request, course_id):
         f"&details={quote(course.description)}&location={quote('水井村風雲客棧')}"
     )
     
+    # Check for modal session data
+    show_qr_modal = request.session.pop('show_qr_modal', False)
+    reg_token = request.session.pop('reg_token', None)
+    reg_name = request.session.pop('reg_name', None)
+    reg_course = request.session.pop('reg_course', None)
+    
+    show_waitlist_modal = request.session.pop('show_waitlist_modal', False)
+    waitlist_num = request.session.pop('waitlist_num', None)
+    
+    # If reg_name was saved for waitlist, ensure it's in context
+    if show_waitlist_modal:
+        reg_name = reg_name
+        reg_course = reg_course
+
     return render(request, 'inn_app/course_detail.html', {
         'course': course, 
         'gcal_url': gcal_url,
         'is_reg_open': is_reg_open,
         'reg_status_msg': reg_status_msg,
-        'is_full': is_full
+        'is_full': is_full,
+        'show_qr_modal': show_qr_modal,
+        'reg_token': reg_token,
+        'reg_name': reg_name,
+        'reg_course': reg_course,
+        'show_waitlist_modal': show_waitlist_modal,
+        'waitlist_num': waitlist_num,
+        'error_modal_msg': locals().get('context_error_msg', None)
     })
 
 def duty_staff(request):
@@ -199,15 +236,23 @@ def my_bookings(request):
 def cancel_booking(request, reg_id):
     if request.method == 'POST':
         registration = get_object_or_404(Registration, id=reg_id)
-        course_title = registration.course.title
-        is_wait = registration.is_waitlisted
-        registration.delete()
-        if is_wait:
-            messages.success(request, f'✅ 已取消【{course_title}】的候補登記！')
+        
+        # [加固身分驗證] 核對取消者的電話與 Email 是否與紀錄相符，防止 IDOR 橫向越權刪除
+        phone = request.POST.get('confirm_phone', '').strip()
+        email = request.POST.get('confirm_email', '').strip()
+        
+        if phone == registration.phone and email == registration.email:
+            course_title = registration.course.title
+            is_wait = registration.is_waitlisted
+            registration.delete()
+            if is_wait:
+                messages.success(request, f'✅ 已取消【{course_title}】的候補登記！')
+            else:
+                messages.success(request, f'✅ 已成功取消【{course_title}】的報名紀錄！該名額已經重新釋出。')
         else:
-            messages.success(request, f'✅ 已成功取消【{course_title}】的報名紀錄！該名額已經重新釋出。')
-    # Because my_bookings requires POST to show results, we just redirect it to a clean GET state. 
-    # Or ideally, redirect to home page with success message.
+            # 即使是在本地，也要防止惡意 ID 掃描
+            messages.error(request, '❌ 身分驗證失敗，無法取消報名。請確保您是從本人查詢頁面進入操作。')
+            
     return redirect('inn_app:home')
 
 def check_in_scan(request, token):
@@ -256,11 +301,16 @@ def event_detail(request, event_id):
 def contact(request):
     contact_info = ContactInfo.objects.filter(is_active=True).first()
     if request.method == 'POST':
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
+        # [資安加固] 加入輸入長度限制，防止資料庫洪水攻擊
+        name = request.POST.get('name', '')[:100].strip()
+        phone = request.POST.get('phone', '')[:50].strip()
+        email = request.POST.get('email', '')[:150].strip()
+        message = request.POST.get('message', '')[:5000].strip()
         
+        if not name or not message:
+            messages.error(request, '請確認已經填寫完整的姓名與訊息內容。')
+            return redirect('inn_app:contact')
+            
         # Save to database
         ContactMessage.objects.create(
             name=name,

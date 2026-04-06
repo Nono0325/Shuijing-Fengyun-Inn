@@ -96,11 +96,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'inn_app:home' %}">首頁</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inn_app:story_list' %}">故事牆</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inn_app:usr_showcase' %}">成果展示</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">關於風雲客棧</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'inn_app:story_list' %}">故事牆</a></li>
+                            <li><a class="dropdown-item" href="{% url 'inn_app:usr_showcase' %}">成果展示</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">客棧活動</a>

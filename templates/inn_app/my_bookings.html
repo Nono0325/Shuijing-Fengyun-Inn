@@ -60,6 +60,8 @@
                                 {% if not reg.is_attended %}
                                 <form action="{% url 'inn_app:cancel_booking' reg.id %}" method="post" onsubmit="return confirm('您確定要取消這筆報名嗎？此動作為永久取消且無法復原！');">
                                     {% csrf_token %}
+                                    <input type="hidden" name="confirm_phone" value="{{ reg.phone }}">
+                                    <input type="hidden" name="confirm_email" value="{{ reg.email }}">
                                     <button type="submit" class="btn btn-outline-danger shadow-sm rounded-pill px-4">
                                         <i class="fa-solid fa-xmark text-danger me-1"></i> 取消參加
                                     </button>

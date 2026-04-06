@@ -46,7 +46,9 @@
                                     {{ tech.description|safe }}
                                 </div>
                                 {% if tech.image %}
-                                <img src="{{ tech.image.url }}" class="img-fluid rounded-3 mb-3" alt="{{ tech.name }}" style="max-height: 200px; object-fit: cover;">
+                                <div class="ratio ratio-16x9 mb-3 rounded-3 overflow-hidden">
+                                    <img src="{{ tech.image.url }}" alt="{{ tech.name }}" style="object-fit: cover;">
+                                </div>
                                 {% endif %}
                                 <span class="badge bg-light text-dark align-self-start">科技項目</span>
                             </div>
@@ -72,9 +74,13 @@
                         <div class="col-6">
                             <div class="bg-white p-4 rounded-4 text-center shadow-sm h-100 hover-shadow transition">
                                 {% if tech.image %}
-                                <img src="{{ tech.image.url }}" class="img-fluid rounded-3 mb-3" alt="{{ tech.name }}" style="height: 60px; object-fit: contain;">
+                                <div class="ratio ratio-1x1 mx-auto mb-3" style="width: 80px;">
+                                    <img src="{{ tech.image.url }}" alt="{{ tech.name }}" style="object-fit: contain;">
+                                </div>
                                 {% else %}
-                                <i class="fa-solid fa-cube fa-3x text-primary mb-3"></i>
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-cube fa-3x text-primary"></i>
+                                </div>
                                 {% endif %}
                                 <h6 class="fw-bold">{{ tech.name }}</h6>
                                 <p class="small text-muted mb-0">{{ tech.description|striptags|truncatechars:40 }}</p>
