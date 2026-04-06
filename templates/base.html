@@ -76,6 +76,11 @@
             bottom: 20%;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
         }
+        
+        /* Search bar placeholder color */
+        .placeholder-light::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -114,8 +119,16 @@
                         <a class="nav-link" href="{% url 'inn_app:contact' %}">聯絡我們</a>
                     </li>
                     <li class="nav-item ms-lg-3">
-                        <a class="btn btn-outline-light rounded-pill px-3 py-1 mt-1 hover-elevate shadow-sm" href="{% url 'inn_app:my_bookings' %}">
-                            <i class="fa-solid fa-magnifying-glass me-1 text-white"></i>查詢報名
+                        <form action="{% url 'inn_app:search' %}" method="get" class="d-flex align-items-center bg-white bg-opacity-10 rounded-pill px-2 py-1 shadow-sm border border-secondary">
+                            <input type="text" name="q" class="form-control form-control-sm bg-transparent border-0 text-white placeholder-light" placeholder="搜尋..." style="width: 120px; outline: none; box-shadow: none;">
+                            <button type="submit" class="btn btn-sm text-white p-0 ps-1 pe-2">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </form>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 mt-md-0 mt-2 hover-elevate shadow-sm" href="{% url 'inn_app:my_bookings' %}">
+                            <i class="fa-solid fa-calendar-check me-1"></i>查詢報名
                         </a>
                     </li>
                 </ul>

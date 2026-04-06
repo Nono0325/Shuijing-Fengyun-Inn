@@ -23,4 +23,5 @@ urlpatterns = [
     path('usr-showcase/', views.usr_showcase, name='usr_showcase'),
     path('aiot-guide/', views.aiot_guide, name='aiot_guide'),
     path('workshops/', views.workshop_list, name='workshop_list'),
+    path('search/', views.search, name='search'),
 ]

@@ -304,3 +304,54 @@ def aiot_guide(request):
 def workshop_list(request):
     workshops = ExperienceCourse.objects.all()
     return render(request, 'inn_app/workshop_list.html', {'workshops': workshops})
+
+def search(request):
+    query = request.GET.get('q', '').strip()
+    results = {
+        'stories': [],
+        'courses': [],
+        'events': [],
+        'achievements': [],
+        'tech_projects': [],
+        'workshops': []
+    }
+    
+    if query:
+        # Search Stories
+        results['stories'] = Story.objects.filter(
+            Q(title__icontains=query) | Q(content__icontains=query)
+        )
+        
+        # Search Courses
+        results['courses'] = Course.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+        
+        # Search Events
+        results['events'] = Event.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+        
+        # Search USR Achievements
+        results['achievements'] = USRAchievement.objects.filter(
+            Q(title__icontains=query) | Q(summary__icontains=query)
+        )
+        
+        # Search Tech Projects
+        results['tech_projects'] = TechProject.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+        
+        # Search Workshops
+        results['workshops'] = ExperienceCourse.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+
+    # Calculate total count
+    total_count = sum(len(list(v)) for v in results.values())
+    
+    return render(request, 'inn_app/search_results.html', {
+        'query': query,
+        'results': results,
+        'total_count': total_count
+    })
