@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}故事牆 - 風雲客棧數位入口平台{% endblock %}
 
@@ -24,7 +25,7 @@
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                     {% if story.image %}
-                    <img src="{{ story.image.url }}" class="card-img-top" alt="{{ story.title }}" style="height: 220px; object-fit: cover;">
+                    {% if story.image|is_video %}<video src="{{ story.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ story.title }}" style="height: 220px; object-fit: cover;"></video>{% else %}<img src="{{ story.image.url }}" class="card-img-top" alt="{{ story.title }}" style="height: 220px; object-fit: cover;">{% endif %}
                     {% else %}
                     <div class="bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 220px;">
                         <i class="fa-solid fa-feather-pointed text-primary fa-4x"></i>

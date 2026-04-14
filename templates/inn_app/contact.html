@@ -66,6 +66,19 @@
                 </div>
             </div>
         </div>
+        <!-- Google Map Section -->
+        {% if contact_info.map_iframe %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="map-container" style="min-height: 400px;">
+                        <style>.map-container iframe { width: 100% !important; height: 400px !important; border: 0 !important; }</style>
+                        {{ contact_info.map_iframe|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

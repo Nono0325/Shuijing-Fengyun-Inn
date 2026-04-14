@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}體驗工作坊 - 風雲客棧數位入口平台{% endblock %}
 
@@ -15,7 +16,7 @@
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                     {% if w.image %}
-                    <img src="{{ w.image.url }}" class="card-img-top" alt="{{ w.name }}" style="height: 250px; object-fit: cover;">
+                    {% if w.image|is_video %}<video src="{{ w.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ w.name }}" style="height: 250px; object-fit: cover;"></video>{% else %}<img src="{{ w.image.url }}" class="card-img-top" alt="{{ w.name }}" style="height: 250px; object-fit: cover;">{% endif %}
                     {% else %}
                     <div class="bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 250px;">
                         {% if '機器人' in w.category %}<i class="fa-solid fa-robot text-primary fa-5x"></i>

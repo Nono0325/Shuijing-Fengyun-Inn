@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% load static %}
 
 {% block content %}
@@ -15,7 +16,7 @@
         {% for item in carousels %}
         <div class="carousel-item {% if forloop.first %}active{% endif %}">
             {% if item.image %}
-            <img src="{{ item.image.url }}" class="d-block w-100" alt="{{ item.title }}">
+            {% if item.image|is_video %}<video src="{{ item.image.url }}" autoplay loop muted playsinline  class="d-block w-100" alt="{{ item.title }}"></video>{% else %}<img src="{{ item.image.url }}" class="d-block w-100" alt="{{ item.title }}">{% endif %}
             {% else %}
             <img src="https://via.placeholder.com/1920x800.png?text=Image" class="d-block w-100" alt="Placeholder">
             {% endif %}
@@ -105,7 +106,7 @@
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-elevate transition">
                 {% if service.image %}
-                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.title }}" style="height: 250px; object-fit: cover;">
+                {% if service.image|is_video %}<video src="{{ service.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ service.title }}" style="height: 250px; object-fit: cover;"></video>{% else %}<img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.title }}" style="height: 250px; object-fit: cover;">{% endif %}
                 {% else %}
                 <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
                     <i class="fa-solid fa-seedling text-success fa-4x"></i>

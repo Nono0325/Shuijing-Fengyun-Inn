@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% load static %}
 
 {% block title %}{{ course.title }} - 水井村風雲客棧{% endblock %}
@@ -20,7 +21,7 @@
     <div class="row align-items-center mb-5">
         <div class="col-lg-6 mb-4 mb-lg-0">
             {% if course.image %}
-            <img src="{{ course.image.url }}" class="img-fluid rounded-4 shadow" alt="{{ course.title }}">
+            {% if course.image|is_video %}<video src="{{ course.image.url }}" autoplay loop muted playsinline  class="img-fluid rounded-4 shadow" alt="{{ course.title }}"></video>{% else %}<img src="{{ course.image.url }}" class="img-fluid rounded-4 shadow" alt="{{ course.title }}">{% endif %}
             {% else %}
             <div class="bg-secondary rounded-4 shadow d-flex align-items-center justify-content-center text-white" style="height: 400px;">
                 <i class="fa-solid fa-camera fa-4x mb-3"></i>

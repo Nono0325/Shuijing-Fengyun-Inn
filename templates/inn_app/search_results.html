@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 {% load static %}
 
 {% block title %}搜尋結果 - 水井村風雲客棧{% endblock %}
@@ -29,7 +30,7 @@
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0">
                         {% if story.image %}
-                        <img src="{{ story.image.url }}" class="card-img-top" alt="{{ story.title }}" style="height: 200px; object-fit: cover;">
+                        {% if story.image|is_video %}<video src="{{ story.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ story.title }}" style="height: 200px; object-fit: cover;"></video>{% else %}<img src="{{ story.image.url }}" class="card-img-top" alt="{{ story.title }}" style="height: 200px; object-fit: cover;">{% endif %}
                         {% endif %}
                         <div class="card-body">
                             <span class="badge bg-secondary mb-2">{{ story.get_category_display }}</span>
@@ -53,7 +54,7 @@
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0">
                         {% if course.image %}
-                        <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
+                        {% if course.image|is_video %}<video src="{{ course.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;"></video>{% else %}<img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">{% endif %}
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title fw-bold">{{ course.title }}</h5>
@@ -98,7 +99,7 @@
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0">
                         {% if ach.image %}
-                        <img src="{{ ach.image.url }}" class="card-img-top" alt="{{ ach.title }}" style="height: 180px; object-fit: cover;">
+                        {% if ach.image|is_video %}<video src="{{ ach.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ ach.title }}" style="height: 180px; object-fit: cover;"></video>{% else %}<img src="{{ ach.image.url }}" class="card-img-top" alt="{{ ach.title }}" style="height: 180px; object-fit: cover;">{% endif %}
                         {% endif %}
                         <div class="card-body">
                              <span class="badge bg-warning text-dark mb-2">{{ ach.get_type_display }}</span>
@@ -142,7 +143,7 @@
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0">
                         {% if item.image %}
-                        <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 150px; object-fit: cover;">
+                        {% if item.image|is_video %}<video src="{{ item.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ item.name }}" style="height: 150px; object-fit: cover;"></video>{% else %}<img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 150px; object-fit: cover;">{% endif %}
                         {% endif %}
                         <div class="card-body">
                             <span class="badge bg-danger mb-2">{{ item.category }}</span>

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import CarouselItem, Service, DutyStaff, Course, Registration, SigninTemplate, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection, ContactInfo, ContactMessage
+from .models import CarouselItem, Service, DutyStaff, Course, Registration, SigninTemplate, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection, ContactInfo, ContactMessage, LoginRecord
+from django.contrib.admin.models import LogEntry
 import openpyxl
 from django.http import HttpResponse
 from django.utils.timezone import localtime
@@ -220,3 +221,35 @@ class ContactMessageAdmin(admin.ModelAdmin):
     readonly_fields = ('name', 'phone', 'email', 'message', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('name', 'phone', 'email', 'message')
+
+@admin.register(LoginRecord)
+class LoginRecordAdmin(admin.ModelAdmin):
+    list_display = ('username', 'ip_address', 'mac_address', 'user_agent', 'login_time')
+    search_fields = ('username', 'ip_address', 'mac_address')
+    list_filter = ('login_time',)
+    readonly_fields = ('user', 'username', 'ip_address', 'mac_address', 'user_agent', 'login_time')
+
+    def has_add_permission(self, request):
+        return False
+        
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag', 'change_message')
+    list_filter = ('action_time', 'user', 'content_type', 'action_flag')
+    search_fields = ('object_repr', 'change_message', 'user__username')
+    readonly_fields = [f.name for f in LogEntry._meta.get_fields()]
+
+    def has_add_permission(self, request):
+        return False
+        
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}成果展示 - 風雲客棧數位入口平台{% endblock %}
 
@@ -17,7 +18,7 @@
                     <div class="row g-0 h-100">
                         <div class="col-md-4">
                             {% if ach.image %}
-                            <img src="{{ ach.image.url }}" class="img-fluid h-100" alt="{{ ach.title }}" style="object-fit: cover;">
+                            {% if ach.image|is_video %}<video src="{{ ach.image.url }}" autoplay loop muted playsinline  class="img-fluid h-100" alt="{{ ach.title }}" style="object-fit: cover;"></video>{% else %}<img src="{{ ach.image.url }}" class="img-fluid h-100" alt="{{ ach.title }}" style="object-fit: cover;">{% endif %}
                             {% else %}
                             <div class="bg-dark bg-opacity-10 d-flex align-items-center justify-content-center h-100">
                                 {% if ach.type == 'video' %}<i class="fa-solid fa-circle-play text-danger fa-4x"></i>
