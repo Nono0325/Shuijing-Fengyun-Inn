@@ -58,11 +58,12 @@ chmod +x init_setup.sh && ./init_setup.sh
 ### 2. 智慧報名與回饋系統
 - **多維度報名回饋 (Modals)**：
   - **成功通知**：自動生成包含 **QR Code 簽到憑證** 的彈窗，並支持 PNG 一鍵下載。
+  - **自助查詢**：民眾可於「查詢報名紀錄」頁面隨時索取並**下載 QR Code**，無須翻找信箱。
   - **候補登記**：報名額滿時自動轉為候補，並告知當前順位。
   - **重複提醒**：自動偵測重複報名並友好提示。
 - **自動化後台管理**：
-  - 支持 **Excel 匯出**與 **Word 簽到表套印**。
-  - **QR Code 掃碼報到**：工作人員掃碼後即完成核銷（具備權限驗證）。
+  - 支持 **Excel 匯出** (包含報到狀態與具體時間) 與 **Word 簽到表套印**。
+  - **QR Code 掃碼報到**：工作人員掃碼後即完成核銷，系統精確記錄**報到秒數時間點**。
 
 ### 3. 進階安全加固 (Security)
 - **IDOR 漏洞防護**：取消報名需通過手機/Email 雙因子驗證，防止惡意刪除他人紀錄。
@@ -70,14 +71,14 @@ chmod +x init_setup.sh && ./init_setup.sh
 - **生產環境優化**：預設啟用 X-Frame-Options (Clickjacking) 與 XSS-Filter 防護標頭。
 
 ## 🔑 管理員資訊
-- **後台網址**: `/admin/Nono`
+- **後台網址**: `/admin/Nono/`
 - **預設帳號**: `cmlin`
 - **預設密碼**: `12345678`
 
 ---
 
 ## 📂 技術堆疊
-- **Backend**: Django 6.0, SQLite (Local) / PostgreSQL (Cloud)
+- **Backend**: Django 5.2+, SQLite (Local) / PostgreSQL (Cloud)
 - **Frontend**: Bootstrap 5, WhiteNoise (Static serving)
 - **Extra**: docxtpl (Word 範本), openpyxl (Excel 匯出)
 
