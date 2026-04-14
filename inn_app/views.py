@@ -36,10 +36,11 @@ def course_detail(request, course_id):
     from django.utils import timezone
     course = get_object_or_404(Course, id=course_id, is_active=True)
     
-    # 時效過濾器
+    # 時效與狀態過濾器 (初始化狀態)
     now = timezone.now()
     is_reg_open = True
     reg_status_msg = ""
+    context_error_msg = [] # 用來存放要顯示在 Modal 中的錯誤訊息列表
     
     if course.reg_start_time and now < course.reg_start_time:
         is_reg_open = False
@@ -50,7 +51,9 @@ def course_detail(request, course_id):
         
     from django.db.models import Sum
     current_regs = Registration.objects.filter(course=course, is_waitlisted=False).aggregate(total=Sum('headcount'))['total'] or 0
-    is_full = current_regs >= course.capacity
+    # [公平性優化] 若已有候補名單，則該課程對外應維持「額滿」狀態，防止新訪客插隊
+    has_waitlist = Registration.objects.filter(course=course, is_waitlisted=True).exists()
+    is_full = (current_regs >= course.capacity) or has_waitlist
 
     if request.method == 'POST':
         # 把接收到的資料送入表單過濾器
@@ -58,20 +61,26 @@ def course_detail(request, course_id):
         
         # Check time
         if not is_reg_open:
-            messages.error(request, f'無法進行報名：{reg_status_msg}')
+            msg = f'無法進行報名：{reg_status_msg}'
+            messages.error(request, msg)
+            # 將錯誤存入 session，以便在 Redirect 後也能觸發 Error Modal
+            request.session['error_modal_msg'] = [msg]
             return redirect('inn_app:course_detail', course_id=course.id)
             
         if form.is_valid():
             from django.db.models import Sum
             current_registrations = Registration.objects.filter(course=course, is_waitlisted=False).aggregate(total=Sum('headcount'))['total'] or 0
+            # [公平性檢核] 同步檢查是否有候補者在排隊
+            waitlist_exists = Registration.objects.filter(course=course, is_waitlisted=True).exists()
+            
             registration = form.save(commit=False)
             registration.course = course
             
             requested = registration.headcount
             from django.core.mail import send_mail
             
-            if current_registrations + requested > course.capacity:
-                # [候補機制] 額滿則轉為候補單
+            if (current_registrations + requested > course.capacity) or waitlist_exists:
+                # [候補機制] 額滿或已有候補則轉為候補單
                 registration.is_waitlisted = True
                 registration.save()
                 messages.warning(request, f'⚠️ 正常名額已滿，您已成功排入候補名單（目前為候補第 {registration.waitlist_number} 號）！若有民眾取消釋出名額，我們將第一時間與您聯繫。')
@@ -109,15 +118,11 @@ def course_detail(request, course_id):
             return redirect('inn_app:course_detail', course_id=course.id)
         else:
             # Collect errors for the modal
-            error_msg_list = []
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{error}")
-                    error_msg_list.append(error)
-            
-            # Form errors are rendered directly, so we pass this specifically for the render
-            context_error_msg = "\n".join(error_msg_list)
-            
+                    context_error_msg.append(error)
+                    
     # Generate Google Calendar URL
     from urllib.parse import quote
     end_time = course.end_time if course.end_time else course.start_time + timedelta(hours=2)
@@ -129,7 +134,7 @@ def course_detail(request, course_id):
         f"&details={quote(course.description)}&location={quote('水井村風雲客棧')}"
     )
     
-    # Check for modal session data
+    # Check for modal session data (Popping data passed via redirect)
     show_qr_modal = request.session.pop('show_qr_modal', False)
     reg_token = request.session.pop('reg_token', None)
     reg_name = request.session.pop('reg_name', None)
@@ -138,11 +143,11 @@ def course_detail(request, course_id):
     show_waitlist_modal = request.session.pop('show_waitlist_modal', False)
     waitlist_num = request.session.pop('waitlist_num', None)
     
-    # If reg_name was saved for waitlist, ensure it's in context
-    if show_waitlist_modal:
-        reg_name = reg_name
-        reg_course = reg_course
-
+    # 若 session 中有預存的錯誤訊息 (多位在 Redirect 後讀取)
+    session_errors = request.session.pop('error_modal_msg', [])
+    if session_errors:
+        context_error_msg.extend(session_errors)
+        
     return render(request, 'inn_app/course_detail.html', {
         'course': course, 
         'gcal_url': gcal_url,
@@ -155,7 +160,7 @@ def course_detail(request, course_id):
         'reg_course': reg_course,
         'show_waitlist_modal': show_waitlist_modal,
         'waitlist_num': waitlist_num,
-        'error_modal_msg': locals().get('context_error_msg', None)
+        'error_modal_msg': context_error_msg if context_error_msg else None
     })
 
 def duty_staff(request):
@@ -266,7 +271,9 @@ def check_in_scan(request, token):
     if registration.is_attended:
         messages.warning(request, f"⚠️ 【{registration.name}】（共 {registration.headcount} 人）稍早已經報到過了喔！請勿重複核銷。")
     else:
+        from django.utils import timezone
         registration.is_attended = True
+        registration.attended_at = timezone.now()
         registration.save()
         messages.success(request, f"🎉 掃碼核銷成功！【{registration.name}】（共 {registration.headcount} 人）已成功登記入場。")
         
@@ -372,9 +379,9 @@ def search(request):
             Q(title__icontains=query) | Q(content__icontains=query)
         )
         
-        # Search Courses
+        # Search Courses (Title, Description, Instructor)
         results['courses'] = Course.objects.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
+            Q(title__icontains=query) | Q(description__icontains=query) | Q(instructor__icontains=query)
         )
         
         # Search Events
@@ -382,7 +389,7 @@ def search(request):
             Q(title__icontains=query) | Q(description__icontains=query)
         )
         
-        # Search USR Achievements
+        # Search USR Achievements (Title, Summary)
         results['achievements'] = USRAchievement.objects.filter(
             Q(title__icontains=query) | Q(summary__icontains=query)
         )

@@ -14,11 +14,13 @@ def export_to_excel(modeladmin, request, queryset):
     ws = wb.active
     ws.title = '報名資料清單'
     
-    columns = ['報名課程', '姓名', '性別', '聯絡電話', 'Email', '狀態', '人數', '報名時間']
+    columns = ['報名課程', '姓名', '性別', '聯絡電話', 'Email', '狀態', '報到狀態', '報到時間', '人數', '報名時間']
     ws.append(columns)
     
     for obj in queryset:
         status = f'候補第 {obj.waitlist_number} 號' if obj.is_waitlisted else '正取'
+        checkin_status = '已報到' if obj.is_attended else '未報到'
+        checkin_time = localtime(obj.attended_at).strftime('%Y-%m-%d %H:%M:%S') if obj.attended_at else '-'
         ws.append([
             obj.course.title,
             obj.name,
@@ -26,11 +28,13 @@ def export_to_excel(modeladmin, request, queryset):
             obj.phone,
             obj.email,
             status,
+            checkin_status,
+            checkin_time,
             obj.headcount,
             localtime(obj.created_at).strftime('%Y-%m-%d %H:%M:%S')
         ])
         
-        wb.save(response)
+    wb.save(response)
     return response
 
 @admin.action(description='批次匯出課程報名名單 (.xlsx)')
@@ -46,12 +50,14 @@ def export_course_registrations_to_excel(modeladmin, request, queryset):
         safe_title = str(course.title)[:31].replace('/', '_').replace('\\', '_').replace('*', '_').replace('?', '_')
         ws = wb.create_sheet(title=safe_title)
         
-        columns = ['報名課程', '姓名', '性別', '聯絡電話', 'Email', '狀態', '人數', '報名時間']
+        columns = ['報名課程', '姓名', '性別', '聯絡電話', 'Email', '狀態', '報到狀態', '報到時間', '人數', '報名時間']
         ws.append(columns)
         
         registrations = Registration.objects.filter(course=course).order_by('created_at')
         for obj in registrations:
             status = f'候補第 {obj.waitlist_number} 號' if obj.is_waitlisted else '正取'
+            checkin_status = '已報到' if obj.is_attended else '未報到'
+            checkin_time = localtime(obj.attended_at).strftime('%Y-%m-%d %H:%M:%S') if obj.attended_at else '-'
             ws.append([
                 obj.course.title,
                 obj.name,
@@ -59,6 +65,8 @@ def export_course_registrations_to_excel(modeladmin, request, queryset):
                 obj.phone,
                 obj.email,
                 status,
+                checkin_status,
+                checkin_time,
                 obj.headcount,
                 localtime(obj.created_at).strftime('%Y-%m-%d %H:%M:%S')
             ])
@@ -160,8 +168,8 @@ class CourseAdmin(admin.ModelAdmin):
 
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'course', 'phone', 'headcount', 'get_status', 'is_attended', 'created_at')
-    list_filter = ('course', 'is_waitlisted', 'is_attended', 'created_at')
+    list_display = ('name', 'course', 'phone', 'headcount', 'get_status', 'is_attended', 'attended_at', 'created_at')
+    list_filter = ('course', 'is_waitlisted', 'is_attended', 'created_at', 'attended_at')
     search_fields = ('name', 'phone')
     actions = [export_to_excel]
     

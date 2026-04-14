@@ -87,6 +87,7 @@ class Registration(models.Model):
     headcount = models.IntegerField('報名人數', default=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
     is_waitlisted = models.BooleanField('排入候補', default=False)
     is_attended = models.BooleanField('已報到', default=False)
+    attended_at = models.DateTimeField('報到時間', null=True, blank=True)
     checkin_token = models.UUIDField('掃碼憑證', default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField('報名時間', auto_now_add=True)
 

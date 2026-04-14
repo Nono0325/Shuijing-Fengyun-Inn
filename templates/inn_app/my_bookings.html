@@ -73,11 +73,20 @@
                             {% if reg.is_waitlisted %}
                                 <div class="text-center text-muted"> <i class="fa-solid fa-clock-rotate-left fa-3x mb-2"></i> <h6 class="fw-bold mt-2">候補中...<br>暫無憑證</h6> </div>
                             {% elif reg.is_attended %}
-                                <div class="text-center text-success"> <i class="fa-solid fa-check-circle fa-4x mb-2"></i> <h6 class="fw-bold mt-2">已核銷入場</h6> </div>
+                                <div class="text-center text-success"> 
+                                    <div class="mb-2">
+                                        <i class="fa-solid fa-circle-check fa-4x"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1">已核銷入場</h6>
+                                    <small class="text-muted d-block">{{ reg.attended_at|date:"m/d H:i" }}</small>
+                                </div>
                             {% else %}
-                                <div class="text-center">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.scheme }}://{{ request.get_host }}{% url 'inn_app:check_in_scan' reg.checkin_token %}" alt="報到 QR Code" class="img-fluid rounded-3 mb-2 shadow-sm bg-white p-1" style="max-width: 130px;">
-                                    <h6 class="fw-bold text-primary mb-0 mt-1">現場報到用</h6>
+                                <div class="text-center qr-container">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.scheme }}://{{ request.get_host }}{% url 'inn_app:check_in_scan' reg.checkin_token %}" alt="報到 QR Code" class="img-fluid rounded-3 shadow-sm bg-white p-1" style="max-width: 120px;" id="qr-{{ reg.id }}">
+                                    <h6 class="fw-bold text-primary mb-2 mt-2">現場報到用</h6>
+                                    <button onclick="downloadQR('qr-{{ reg.id }}', 'CheckIn_{{ reg.name }}_{{ reg.course.id }}')" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">
+                                        <i class="fa-solid fa-download me-1"></i>下載
+                                    </button>
                                 </div>
                             {% endif %}
                         </div>
@@ -97,6 +106,30 @@
 </div>
 
 <script>
+const downloadQR = async (imgId, fileName) => {
+    const img = document.getElementById(imgId);
+    try {
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${fileName}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Download failed:', error);
+        // Fallback for some browsers
+        const link = document.createElement('a');
+        link.href = img.src;
+        link.target = '_blank';
+        link.download = `${fileName}.png`;
+        link.click();
+    }
+};
+
 // Bootstrap 5 自訂表單強烈驗證機制
 (function () {
   'use strict'

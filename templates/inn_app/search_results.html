@@ -30,7 +30,7 @@
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0">
                         {% if story.image %}
-                        {% if story.image|is_video %}<video src="{{ story.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ story.title }}" style="height: 200px; object-fit: cover;"></video>{% else %}<img src="{{ story.image.url }}" class="card-img-top" alt="{{ story.title }}" style="height: 200px; object-fit: cover;">{% endif %}
+                        {% if story.image|is_video %}<video src="{{ story.image.url }}" autoplay loop muted playsinline  class="card-img-top" style="height: 200px; object-fit: cover;"></video>{% else %}<img src="{{ story.image.url }}" class="card-img-top" alt="{{ story.title }}" style="height: 200px; object-fit: cover;">{% endif %}
                         {% endif %}
                         <div class="card-body">
                             <span class="badge bg-secondary mb-2">{{ story.get_category_display }}</span>
@@ -54,7 +54,7 @@
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm border-0">
                         {% if course.image %}
-                        {% if course.image|is_video %}<video src="{{ course.image.url }}" autoplay loop muted playsinline  class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;"></video>{% else %}<img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">{% endif %}
+                        {% if course.image|is_video %}<video src="{{ course.image.url }}" autoplay loop muted playsinline  class="card-img-top" style="height: 200px; object-fit: cover;"></video>{% else %}<img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">{% endif %}
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title fw-bold">{{ course.title }}</h5>
