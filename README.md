@@ -70,7 +70,7 @@ chmod +x init_setup.sh && ./init_setup.sh
 - **生產環境優化**：預設啟用 X-Frame-Options (Clickjacking) 與 XSS-Filter 防護標頭。
 
 ## 🔑 管理員資訊
-- **後台網址**: `/admin/`
+- **後台網址**: `/admin/Nono`
 - **預設帳號**: `cmlin`
 - **預設密碼**: `12345678`
 
