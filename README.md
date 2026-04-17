@@ -1,4 +1,4 @@
-# 🌊 水井村風雲客棧數位入口平台 (Standard USR Portal)
+# 🌊 水井村風雲客棧數位平台 (Standard USR Portal)
 
 [![Deploy to Render](https://render.com/images/deploy-to-render.button.svg)](https://render.com/deploy)
 
